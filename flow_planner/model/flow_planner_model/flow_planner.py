@@ -27,7 +27,7 @@ class FlowPlanner(DiffusionADPlanner):
         
         data_processor: ModelInputProcessor = None,
         
-        device='cuda',
+        device='npu',
         **planner_params
     ):
         

@@ -19,7 +19,7 @@ class FlowPlannerDecoder(nn.Module):
             preproj_hidden=256,
             enable_attn_dist=False,
             act_pe_type: str = 'learnable',
-            device: str = 'cuda',
+            device: str = 'npu',
             **planner_params
     ):
         super().__init__()

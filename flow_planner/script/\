@@ -10,26 +10,30 @@ save_every_since: 0
 resume_path: null
 pretrained_checkpoint: null
 project: FlowPlannerTraining
-job_name: flow_planner_standard
+job_name: flow_planner_npu
 logger_level: info
 seed: 3402
-device: npu
-num_workers: 4
-use_wandb: false
-pin_mem: true
 
+# NPU设备配置
+device: npu
+num_workers: 2
+use_wandb: false
+pin_mem: false
+
+# 训练配置
 train:
-  batch_size: 2048
+  batch_size: 512
   epoch: 400
   save_utd: 20
 
+# 分布式训练配置
 ddp:
   distributed: true
   world_size: ${oc.env:WORLD_SIZE}
   rank: ${oc.env:LOCAL_RANK}
-  init_process_group: nccl
+  init_process_group: hccl
   addr: ${oc.env:MASTER_ADDR, localhost}
-  port: ${oc.env:MASTER:PORT, 29529}
+  port: ${oc.env:MASTER_PORT, 29529}
 
 model_type: x_start
 
@@ -44,3 +48,4 @@ defaults:
   - scheduler: warmup_const
   - ema: ema
   - _self_
+

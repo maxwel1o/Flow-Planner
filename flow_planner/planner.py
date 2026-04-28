@@ -1,6 +1,7 @@
 
 import warnings
 import torch
+import torch_npu
 import numpy as np
 from typing import Deque, Dict, List, Type
 import hydra
@@ -42,9 +43,9 @@ class FlowPlanner(AbstractPlanner):
             cfg_weight: float = 1.0,
         ):
 
-        assert device in ["cpu", "cuda"], f"device {device} not supported"
-        if device == "cuda":
-            assert torch.cuda.is_available(), "cuda is not available"
+        assert device in ["cpu", "npu"], f"device {device} not supported"
+        if device == "npu":
+            assert torch.npu.is_available(), "npu is not available"
             
         self._future_horizon = future_trajectory_sampling.time_horizon # [s] 
         self._step_interval = future_trajectory_sampling.time_horizon / future_trajectory_sampling.num_poses # [s]

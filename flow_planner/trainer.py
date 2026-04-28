@@ -6,6 +6,7 @@ import argparse
 import random
 from omegaconf import DictConfig, OmegaConf
 import torch
+import torch_npu
 import torch.nn as nn
 import numpy as np
 from tqdm import tqdm
@@ -24,8 +25,11 @@ def set_seed(CUR_SEED):
     random.seed(CUR_SEED)
     np.random.seed(CUR_SEED)
     torch.manual_seed(CUR_SEED)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
+    try:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    except AttributeError:
+        pass
 
 @hydra.main(version_base=None, config_path="script")
 def trainer(cfg: DictConfig):
@@ -55,7 +59,7 @@ def trainer(cfg: DictConfig):
         ckpt = torch.load(cfg.pretrained_checkpoint, weights_only=True)
         model.load_state_dict({n.split("module.")[1]: v for n, v in ckpt['ema_state_dict'].items()})
 
-    model = model.to(local_rank)  # Move model to the current global_rank's GPU
+    model = model.to(f"npu:{local_rank}")
     if cfg.ddp.distributed:
         model = DDP(model, device_ids=[local_rank], output_device=global_rank)
     
@@ -167,7 +171,7 @@ def trainer(cfg: DictConfig):
             epoch_bar.update(1)
             
             if cfg.ddp.distributed:
-                torch.cuda.synchronize()
+                torch.npu.synchronize()
             
     logger.info(f"Training finished - Time consumed: {time.strftime('%H:%M:%S', time.gmtime(time.time()-timer))}")
     

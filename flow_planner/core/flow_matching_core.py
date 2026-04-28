@@ -11,7 +11,7 @@ class FlowMatchingCore(Core):
     def __init__(
             self, 
             input_aug=None,
-            device: str = 'cuda',
+            device: str = 'npu',
             **loss_weights,
     ):
         
